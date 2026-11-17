@@ -43,6 +43,11 @@ function couponValidation(coupon: Coupon) {
   if (typeof active !== "boolean") {
     throw new Error("Invalid coupon");
   }
+
+  // Validar cuando el cupon sea de porcentage que el valor no sea mayor a 100
+  if (type === "percentage" && value > 100) {
+    throw new Error("Invalid coupon");
+  }
 }
 
 function isCouponInactive(active: boolean) {
@@ -62,4 +67,21 @@ export function applyCoupon(total: number, coupon: Coupon): CouponResult {
   couponValidation(coupon);
   isCouponInactive(coupon.active);
   validateMinPurchase(total, coupon.minPurchase);
+
+  // Logica de negocio
+  let discount: number = 0;
+
+  if (coupon.type === "percentage") {
+    discount = total * (coupon.value / 100);
+  }
+
+  /* if ( coupon.type === 'fixed' ) {
+
+  } */
+
+  return {
+    originalTotal: total,
+    discount,
+    finalTotal: total - discount,
+  };
 }
