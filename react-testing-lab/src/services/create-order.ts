@@ -6,7 +6,7 @@ export type CreateOrderType = {
   quantity: number;
 };
 
-const strBlanksRegex = /^\s+$/;
+export const strBlanksRegex = /^\s+$/;
 
 export function createOrder(
   data: CreateOrderType,
