@@ -58,7 +58,7 @@ function isCouponInactive(active: boolean) {
 
 function validateMinPurchase(total: number, minPurchase: number) {
   if (total < minPurchase) {
-    throw new Error("Minium purchase not reached");
+    throw new Error("Minimum purchase not reached");
   }
 }
 

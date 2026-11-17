@@ -26,7 +26,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         active: true,
         code: "ABC1",
-        minPurchase: 10,
+        minPurchase: -30,
         type: "fixed",
         value: 50,
       },
@@ -39,7 +39,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "", // cupon invalido
         value: 50,
-        minPurchase: 10,
+        minPurchase: 60,
         type: "fixed",
         active: true,
       },
@@ -50,7 +50,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "\t", // cupon invalido
         value: 50,
-        minPurchase: 10,
+        minPurchase: 60,
         type: "fixed",
         active: true,
       },
@@ -61,7 +61,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: Infinity, // value infinito
-        minPurchase: 10,
+        minPurchase: 60,
         type: "fixed",
         active: true,
       },
@@ -72,7 +72,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: 0, // value menor o igual que cero
-        minPurchase: 10,
+        minPurchase: 60,
         type: "fixed",
         active: true,
       },
@@ -83,7 +83,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: -1, // value menor o igual que cero
-        minPurchase: 10,
+        minPurchase: 60,
         type: "fixed",
         active: true,
       },
@@ -116,7 +116,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: 50,
-        minPurchase: 10,
+        minPurchase: 60,
         type: "\t" as "percentage" | "fixed", // validar que type sea valido en sus dos tipos: percentage o fixed
         active: true,
       },
@@ -127,7 +127,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: 0,
-        minPurchase: 10,
+        minPurchase: 60,
         type: "ABC" as "percentage" | "fixed", // validar que type sea valido en sus dos tipos: percentage o fixed
         active: true,
       },
@@ -138,7 +138,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: 0,
-        minPurchase: 10,
+        minPurchase: 60,
         type: "fixed",
         active: -1 as unknown as boolean, // validar que active sea un booleano explicitamente y no admita valores falsy o truthy
       },
@@ -149,7 +149,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: 0,
-        minPurchase: 10,
+        minPurchase: 60,
         type: "fixed",
         active: 10 as unknown as boolean, // validar que active sea un booleano explicitamente y no admita valores falsy o truthy
       },
@@ -162,7 +162,7 @@ describe("Validate purchase validation", () => {
       coupon: {
         code: "ABC1",
         value: 101,
-        minPurchase: 30,
+        minPurchase: 60,
         type: "percentage",
         active: true,
       },
@@ -183,7 +183,7 @@ describe("Validate purchase validation", () => {
     const coupon: Coupon = {
       code: "ABC1",
       value: 20,
-      minPurchase: 10,
+      minPurchase: 100,
       type: "percentage",
       active: false,
     };
@@ -201,11 +201,9 @@ describe("Validate purchase validation", () => {
     };
 
     expect(() => applyCoupon(29, coupon)).toThrow(
-      "Minium purchase not reached",
+      "Minimum purchase not reached",
     );
-    expect(() => applyCoupon(30, coupon)).not.toThrow(
-      "Minium purchase not reached",
-    );
+    expect(() => applyCoupon(30, coupon)).not.toThrow();
   });
 });
 
@@ -275,26 +273,78 @@ describe("Calculate fixed coupons", () => {
   });
 
   it("should limit discount when total is less than discount value", () => {
-    const total = 20;
+    const total = 30;
     const coupon: Coupon = {
       code: "COUPON_CODE",
       active: true,
       minPurchase: 20,
       type: "fixed",
-      value: 30,
+      value: 50,
     };
 
     const resp = applyCoupon(total, coupon);
     const expectedResp: CouponResult = {
       discount: 30,
       originalTotal: total,
-      finalTotal: 20,
+      finalTotal: 0,
     };
 
     expect(resp.originalTotal).toBe(total);
     expect(resp.discount).toBeCloseTo(30);
-    expect(resp.finalTotal).toBeCloseTo(20);
+    expect(resp.finalTotal).toBeCloseTo(0);
 
     expect(resp).toEqual(expectedResp);
+  });
+
+  it("should complete purchase when total is zero", () => {
+    const coupon: Coupon = {
+      code: "COUPON_CODE",
+      active: true,
+      minPurchase: 0,
+      type: "fixed",
+      value: 50,
+    };
+
+    const couponPercentage: Coupon = {
+      code: "COUPON_CODE",
+      active: true,
+      minPurchase: 0,
+      type: "percentage",
+      value: 50,
+    };
+
+    const respFixed = applyCoupon(0, coupon);
+    const respPer = applyCoupon(0, couponPercentage);
+
+    expect(respFixed.originalTotal).toBeCloseTo(0);
+    expect(respFixed.discount).toBeCloseTo(0);
+    expect(respFixed.finalTotal).toBeCloseTo(0);
+
+    expect(respPer.originalTotal).toBeCloseTo(0);
+    expect(respPer.discount).toBeCloseTo(0);
+    expect(respPer.finalTotal).toBeCloseTo(0);
+  });
+
+  it("should calculate correctly the purchase discount with floats", () => {
+    const coupon: Coupon = {
+      code: "COUPON_CODE",
+      active: true,
+      minPurchase: 9.99,
+      type: "fixed",
+      value: 5,
+    };
+
+    const resp = applyCoupon(29.99, coupon);
+    const expectedResp: CouponResult = {
+      discount: 5,
+      originalTotal: 29.99,
+      finalTotal: 24.99,
+    };
+
+    expect(resp.discount).toBeCloseTo(5);
+    expect(resp.originalTotal).toBeCloseTo(29.99);
+    expect(resp.finalTotal).toBeCloseTo(24.99);
+
+    expect(resp).toStrictEqual(expectedResp);
   });
 });
