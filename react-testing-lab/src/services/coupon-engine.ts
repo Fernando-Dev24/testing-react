@@ -68,16 +68,11 @@ export function applyCoupon(total: number, coupon: Coupon): CouponResult {
   isCouponInactive(coupon.active);
   validateMinPurchase(total, coupon.minPurchase);
 
-  // Logica de negocio
-  let discount: number = 0;
+  let discount: number = Math.min(total, coupon.value);
 
   if (coupon.type === "percentage") {
     discount = total * (coupon.value / 100);
   }
-
-  /* if ( coupon.type === 'fixed' ) {
-
-  } */
 
   return {
     originalTotal: total,

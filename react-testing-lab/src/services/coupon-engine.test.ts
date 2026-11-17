@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCoupon, type Coupon } from "./coupon-engine";
+import { applyCoupon, type Coupon, type CouponResult } from "./coupon-engine";
 
 type CouponEachType = {
   total: number;
@@ -209,7 +209,7 @@ describe("Validate purchase validation", () => {
   });
 });
 
-describe("Validate percentage coupons", () => {
+describe("Calculate percentage coupons", () => {
   const tests = [
     {
       total: 10,
@@ -247,4 +247,54 @@ describe("Validate percentage coupons", () => {
       expect(resp).toEqual(testItem.expected);
     },
   );
+});
+
+describe("Calculate fixed coupons", () => {
+  it("should apply when discount is less than total purchase", () => {
+    const total = 50;
+    const coupon: Coupon = {
+      code: "COUPON_CODE",
+      active: true,
+      minPurchase: 20,
+      type: "fixed",
+      value: 30,
+    };
+
+    const resp = applyCoupon(total, coupon);
+    const expectedResp: CouponResult = {
+      discount: 30,
+      originalTotal: total,
+      finalTotal: 20,
+    };
+
+    expect(resp.originalTotal).toBe(total);
+    expect(resp.discount).toBeCloseTo(30);
+    expect(resp.finalTotal).toBeCloseTo(20);
+
+    expect(resp).toEqual(expectedResp);
+  });
+
+  it("should limit discount when total is less than discount value", () => {
+    const total = 20;
+    const coupon: Coupon = {
+      code: "COUPON_CODE",
+      active: true,
+      minPurchase: 20,
+      type: "fixed",
+      value: 30,
+    };
+
+    const resp = applyCoupon(total, coupon);
+    const expectedResp: CouponResult = {
+      discount: 30,
+      originalTotal: total,
+      finalTotal: 20,
+    };
+
+    expect(resp.originalTotal).toBe(total);
+    expect(resp.discount).toBeCloseTo(30);
+    expect(resp.finalTotal).toBeCloseTo(20);
+
+    expect(resp).toEqual(expectedResp);
+  });
 });
