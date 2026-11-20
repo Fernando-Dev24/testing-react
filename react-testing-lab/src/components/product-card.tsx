@@ -20,7 +20,7 @@ export const ProductCard = (props: ProductCardProps) => {
       </div>
 
       <div>
-        <p>{formatCurreny(props.price)}</p>
+        <p data-testid="price">{formatCurreny(props.price)}</p>
         <p>{props.inStock ? "Disponible" : "Agotado"}</p>
       </div>
 
