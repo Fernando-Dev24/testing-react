@@ -1,15 +1,17 @@
 import "./App.css";
-import { ProductCard } from "./components/product-card";
+import { QuantitySelector } from "./components/quantity-selector";
 
 function App() {
   return (
     <>
-      <ProductCard
+      {/* <ProductCard
         name="Teclado mecánico"
         category="Periféricos"
         inStock={true}
         price={59.99}
-      />
+      /> */}
+
+      <QuantitySelector stock={5} onAddToCart={() => {}} />
     </>
   );
 }
