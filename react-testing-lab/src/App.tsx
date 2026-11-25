@@ -1,5 +1,7 @@
 import "./App.css";
-import { QuantitySelector } from "./components/quantity-selector";
+// import { ProductCard } from "./components/product-card";
+// import { QuantitySelector } from "./components/quantity-selector";
+import { RegisterForm } from "./components/register-form";
 
 function App() {
   return (
@@ -11,7 +13,9 @@ function App() {
         price={59.99}
       /> */}
 
-      <QuantitySelector stock={5} onAddToCart={() => {}} />
+      {/* <QuantitySelector stock={5} onAddToCart={() => {}} /> */}
+
+      <RegisterForm onSubmit={(data) => console.log({ data })} />
     </>
   );
 }
