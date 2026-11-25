@@ -178,18 +178,30 @@ describe("Quantity selector", () => {
     expect(onAddToCart).not.toHaveBeenCalledTimes(2);
   });
 
-  it("should navigate to increment button and then to 'Add to cart' btn and triggers its functions with keyboard", async () => {
+  it("should navigate to increment button, trigger it, go back to decrement and change state to initial", async () => {
     const user = userEvent.setup();
     const onAddToCart = vi.fn();
 
-    render(<QuantitySelector stock={1} onAddToCart={onAddToCart} />);
+    render(<QuantitySelector stock={3} onAddToCart={onAddToCart} />);
 
+    const counterOutput = screen.getByRole("status", { name: "Cantidad" });
     const incrementBtn = screen.getByRole("button", {
       name: "Incrementar cantidad",
     });
-
-    const addToCartBtn = screen.getByRole("button", {
-      name: "Agregar al carrito",
+    const decrementBtn = screen.getByRole("button", {
+      name: "Disminuir cantidad",
     });
+
+    await user.tab();
+    expect(incrementBtn).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+    expect(counterOutput).toHaveTextContent("2");
+
+    await user.tab({ shift: true });
+    expect(decrementBtn).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+    expect(counterOutput).toHaveTextContent("1");
   });
 });

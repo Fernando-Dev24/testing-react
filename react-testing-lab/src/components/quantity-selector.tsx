@@ -39,7 +39,7 @@ export function QuantitySelector({
             -
           </button>
 
-          <output htmlFor="contador" aria-label="Cantidad">
+          <output id="contador" aria-label="Cantidad">
             {counter}
           </output>
 
