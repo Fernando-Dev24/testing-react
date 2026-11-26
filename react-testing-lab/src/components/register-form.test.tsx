@@ -1,77 +1,58 @@
-import userEvent from "@testing-library/user-event";
-import type { RegisterFormType } from "../core/schemas/register.schema";
-import { vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { RegisterForm } from "./register-form";
+import { describe, expect, it } from "vitest";
+import { setupRegisterFormTest } from "../test/setup-register-form";
 
-type SetupOptions = {
-  onSubmit?: (values: RegisterFormType) => Promise<void> | void;
-};
+describe("Register form", () => {
+  const invalidNamesForms = ["Fe", "\tF\t", "   "];
 
-export function setupRegisterFormTest(options: SetupOptions = {}) {
-  const user = userEvent.setup();
-  const onSubmit = options.onSubmit ?? vi.fn().mockResolvedValue(undefined);
+  const invalidEmailsForms = [
+    "usuario..ejemplo@dominio.com",
+    "juan.perez@dominio_invalido.com",
+    "maria.gomez@empresa@gmail.com",
+  ];
 
-  render(<RegisterForm onSubmit={onSubmit} />);
+  const invalidPasswords = ["refer2408", "1234567"];
 
-  const nameInput = screen.getByRole("textbox", { name: "Nombre de usuario" });
-  const emailInput = screen.getByRole("textbox", {
-    name: "Correo electrónico",
+  const invalidConfirmPasswords = [
+    { password: "refer2402", confirmPassword: "refer2408" },
+    { password: "refer2402", confirmPassword: "" },
+  ];
+
+  it("form should have the default values, no error message before submit, then do it and validate error messages", async () => {
+    const {
+      form,
+      onSubmit,
+      submitForm,
+      getAlertName,
+      getAlertEmail,
+      getAlertPassword,
+      getAlertConfirmPassword,
+      getAlertTerms,
+    } = setupRegisterFormTest();
+
+    expect(form).toHaveFormValues({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
+    });
+
+    expect(getAlertName()).not.toBeInTheDocument();
+    expect(getAlertEmail()).not.toBeInTheDocument();
+    expect(getAlertPassword()).not.toBeInTheDocument();
+    expect(getAlertConfirmPassword()).not.toBeInTheDocument();
+    expect(getAlertTerms()).not.toBeInTheDocument();
+
+    await submitForm();
+
+    expect(getAlertName()).toBeInTheDocument();
+    expect(getAlertEmail()).toBeInTheDocument();
+    expect(getAlertPassword()).toBeInTheDocument();
+    expect(getAlertTerms()).toBeInTheDocument();
+
+    // Este mensaje nunca sale a no ser que la password sea diferente
+    //expect(getAlertConfirmPassword()).toBeInTheDocument();
+
+    expect(onSubmit).not.toHaveBeenCalled();
   });
-  const passwordInput = screen.getByLabelText("Contraseña");
-  const confirmPasswordInput = screen.getByLabelText("Confirmar contraseña");
-  const termsCheckbox = screen.getByRole("checkbox", {
-    name: "Acepto los términos y condiciones",
-  });
-  const submitButton = screen.getByRole("button", { name: "Crear cuenta" });
-
-  async function fillAndSubmit(
-    fields: RegisterFormType = {
-      name: "Fernando Ortiz",
-      email: "correo@correo.gmail.com",
-      password: "refer2408",
-      confirmPassword: "refer2408",
-      terms: true,
-    },
-  ) {
-    if (fields.name) {
-      await user.clear(nameInput);
-      await user.type(nameInput, fields.name);
-    }
-    if (fields.email) {
-      await user.clear(emailInput);
-      await user.type(emailInput, fields.email);
-    }
-    if (fields.password) {
-      await user.clear(passwordInput);
-      await user.type(passwordInput, fields.password);
-    }
-    if (fields.confirmPassword) {
-      await user.clear(confirmPasswordInput);
-      await user.type(confirmPasswordInput, fields.confirmPassword);
-    }
-    if (fields.terms) {
-      await user.clear(termsCheckbox);
-      await user.click(termsCheckbox);
-    }
-
-    await user.click(submitButton);
-  }
-
-  async function toggleTerms() {
-    await user.click(termsCheckbox);
-  }
-
-  return {
-    user,
-    nameInput,
-    emailInput,
-    passwordInput,
-    confirmPasswordInput,
-    termsCheckbox,
-    submitButton,
-    fillAndSubmit,
-    toggleTerms,
-    onSubmit,
-  };
-}
+});

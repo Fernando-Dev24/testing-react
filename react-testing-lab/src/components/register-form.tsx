@@ -32,7 +32,11 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
       </div>
 
       <FormProvider {...form}>
-        <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          aria-label="registro"
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <div>
             <label htmlFor="name">Nombre de usuario</label>
             <input
@@ -42,15 +46,17 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               aria-describedby={errors.name ? "name-error" : undefined}
               {...form.register("name")}
             />
-            <ErrorMessage
-              name="name"
-              control={form.control}
-              render={({ message }) => (
-                <p id="name-error" role="alert">
-                  {message}
-                </p>
-              )}
-            />
+            {form.getFieldState("name").error && (
+              <ErrorMessage
+                name="name"
+                control={form.control}
+                render={({ message }) => (
+                  <p id="name-error" role="alert">
+                    {message}
+                  </p>
+                )}
+              />
+            )}
           </div>
 
           <div>
@@ -62,15 +68,17 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               aria-describedby={errors.email ? "email-error" : undefined}
               {...form.register("email")}
             />
-            <ErrorMessage
-              name="email"
-              control={form.control}
-              render={({ message }) => (
-                <p id="email-error" role="alert">
-                  {message}
-                </p>
-              )}
-            />
+            {form.getFieldState("email").error && (
+              <ErrorMessage
+                name="email"
+                control={form.control}
+                render={({ message }) => (
+                  <p id="email-error" role="alert">
+                    {message}
+                  </p>
+                )}
+              />
+            )}
           </div>
 
           <div>
@@ -82,15 +90,17 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               aria-describedby={errors.password ? "password-error" : undefined}
               {...form.register("password")}
             />
-            <ErrorMessage
-              name="password"
-              control={form.control}
-              render={({ message }) => (
-                <p id="password-error" role="alert">
-                  {message}
-                </p>
-              )}
-            />
+            {form.getFieldState("password").error && (
+              <ErrorMessage
+                name="password"
+                control={form.control}
+                render={({ message }) => (
+                  <p id="password-error" role="alert">
+                    {message}
+                  </p>
+                )}
+              />
+            )}
           </div>
 
           <div>
@@ -104,15 +114,17 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               }
               {...form.register("confirmPassword")}
             />
-            <ErrorMessage
-              name="confirmPassword"
-              control={form.control}
-              render={({ message }) => (
-                <p id="confirmPassword-error" role="alert">
-                  {message}
-                </p>
-              )}
-            />
+            {form.getFieldState("confirmPassword").error && (
+              <ErrorMessage
+                name="confirmPassword"
+                control={form.control}
+                render={({ message }) => (
+                  <p id="confirmPassword-error" role="alert">
+                    {message}
+                  </p>
+                )}
+              />
+            )}
           </div>
 
           <div>
@@ -124,15 +136,17 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               aria-describedby={errors.terms ? "terms-error" : undefined}
             />
             <label htmlFor="terms">Acepto los términos y condiciones</label>
-            <ErrorMessage
-              name="terms"
-              control={form.control}
-              render={({ message }) => (
-                <p id="terms-error" role="alert">
-                  {message}
-                </p>
-              )}
-            />
+            {form.getFieldState("terms").error && (
+              <ErrorMessage
+                name="terms"
+                control={form.control}
+                render={({ message }) => (
+                  <p id="terms-error" role="alert">
+                    {message}
+                  </p>
+                )}
+              />
+            )}
           </div>
 
           <button type="submit" disabled={form.formState.isSubmitting}>
