@@ -33,12 +33,12 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
       <FormProvider {...form}>
         <form
-          aria-label="registro"
+          aria-label="Registro de usuario"
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <div>
-            <label htmlFor="name">Nombre de usuario</label>
+            <label htmlFor="name">Nombre</label>
             <input
               type="text"
               id="name"

@@ -9,14 +9,22 @@ type SetupOptions = {
   onSubmit?: (values: RegisterFormType) => Promise<void> | void;
 };
 
+const DEFAULT_REGISTER_VALUES: RegisterFormType = {
+  name: "Fernando Ortiz",
+  email: "correo@correo.gmail.com",
+  password: "refer2408",
+  confirmPassword: "refer2408",
+  terms: true,
+};
+
 export function setupRegisterFormTest(options: SetupOptions = {}) {
   const user = userEvent.setup();
   const onSubmit = options.onSubmit ?? vi.fn().mockResolvedValue(undefined);
 
   render(<RegisterForm onSubmit={onSubmit} />);
 
-  const form = screen.getByRole("form", { name: "registro" });
-  const nameInput = screen.getByRole("textbox", { name: "Nombre de usuario" });
+  const form = screen.getByRole("form", { name: "Registro de usuario" });
+  const nameInput = screen.getByRole("textbox", { name: "Nombre" });
   const emailInput = screen.getByRole("textbox", {
     name: "Correo electrónico",
   });
@@ -43,34 +51,28 @@ export function setupRegisterFormTest(options: SetupOptions = {}) {
     return screen.queryByText("Debes aceptar los términos y condiciones");
   }
 
-  async function fillFields(
-    fields: RegisterFormType = {
-      name: "Fernando Ortiz",
-      email: "correo@correo.gmail.com",
-      password: "refer2408",
-      confirmPassword: "refer2408",
-      terms: true,
-    },
-  ) {
-    if (fields.name) {
+  async function fillFields(overrides: Partial<RegisterFormType> = {}) {
+    const values = { ...DEFAULT_REGISTER_VALUES, ...overrides };
+
+    if (values.name !== undefined) {
       await user.clear(nameInput);
-      await user.type(nameInput, fields.name);
+      await user.type(nameInput, values.name);
     }
-    if (fields.email) {
+    if (values.email !== undefined) {
       await user.clear(emailInput);
-      await user.type(emailInput, fields.email);
+      await user.type(emailInput, values.email);
     }
-    if (fields.password) {
+    if (values.password !== undefined) {
       await user.clear(passwordInput);
-      await user.type(passwordInput, fields.password);
+      await user.type(passwordInput, values.password);
     }
-    if (fields.confirmPassword) {
+    if (values.confirmPassword !== undefined) {
       await user.clear(confirmPasswordInput);
-      await user.type(confirmPasswordInput, fields.confirmPassword);
+      await user.type(confirmPasswordInput, values.confirmPassword);
     }
-    if (fields.terms) {
-      await user.clear(termsCheckbox);
-      await user.click(termsCheckbox);
+    if (values.terms !== undefined) {
+      // como arranca en false, con hacer un solo toggle lo ponemos en true
+      await toggleTerms();
     }
   }
 
