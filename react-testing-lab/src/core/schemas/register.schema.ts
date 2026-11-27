@@ -19,6 +19,9 @@ export const registerSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     error: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
-  });
+  })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  .transform(({ confirmPassword, ...rest }) => rest);
 
-export type RegisterFormType = z.infer<typeof registerSchema>;
+export type RegisterFormTypeInput = z.input<typeof registerSchema>;
+export type RegisterFormTypeOutput = z.output<typeof registerSchema>;

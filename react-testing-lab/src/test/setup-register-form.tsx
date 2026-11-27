@@ -1,15 +1,18 @@
 import userEvent from "@testing-library/user-event";
-import type { RegisterFormType } from "../core/schemas/register.schema";
+import type {
+  RegisterFormTypeInput,
+  RegisterFormTypeOutput,
+} from "../core/schemas/register.schema";
 import { RegisterForm } from "../components/register-form";
 import { render } from "@testing-library/react";
 import { screen } from "@testing-library/react";
 import { vi } from "vitest";
 
 type SetupOptions = {
-  onSubmit?: (values: RegisterFormType) => Promise<void> | void;
+  onSubmit?: (values: RegisterFormTypeOutput) => Promise<void> | void;
 };
 
-const DEFAULT_REGISTER_VALUES: RegisterFormType = {
+const DEFAULT_REGISTER_VALUES: RegisterFormTypeInput = {
   name: "Fernando Ortiz",
   email: "correo@correo.gmail.com",
   password: "refer2408",
@@ -32,7 +35,7 @@ export function setupRegisterFormTest(options: SetupOptions = {}) {
   const confirmPasswordInput = screen.getByLabelText("Confirmar contraseña");
   const termsCheckbox = screen.getByRole("checkbox", {
     name: "Acepto los términos y condiciones",
-  });
+  }) as HTMLInputElement;
   const submitButton = screen.getByRole("button", { name: "Crear cuenta" });
 
   function getAlertName() {
@@ -51,27 +54,27 @@ export function setupRegisterFormTest(options: SetupOptions = {}) {
     return screen.queryByText("Debes aceptar los términos y condiciones");
   }
 
-  async function fillFields(overrides: Partial<RegisterFormType> = {}) {
+  async function fillFields(overrides: Partial<RegisterFormTypeInput> = {}) {
     const values = { ...DEFAULT_REGISTER_VALUES, ...overrides };
 
     if (values.name !== undefined) {
       await user.clear(nameInput);
-      await user.type(nameInput, values.name);
+      if (values.name) await user.type(nameInput, values.name);
     }
     if (values.email !== undefined) {
       await user.clear(emailInput);
-      await user.type(emailInput, values.email);
+      if (values.email) await user.type(emailInput, values.email);
     }
     if (values.password !== undefined) {
       await user.clear(passwordInput);
-      await user.type(passwordInput, values.password);
+      if (values.password) await user.type(passwordInput, values.password);
     }
     if (values.confirmPassword !== undefined) {
       await user.clear(confirmPasswordInput);
-      await user.type(confirmPasswordInput, values.confirmPassword);
+      if (values.confirmPassword)
+        await user.type(confirmPasswordInput, values.confirmPassword);
     }
-    if (values.terms !== undefined) {
-      // como arranca en false, con hacer un solo toggle lo ponemos en true
+    if (termsCheckbox.checked !== values.terms) {
       await toggleTerms();
     }
   }

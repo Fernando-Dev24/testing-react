@@ -1,16 +1,17 @@
 import { ErrorMessage, FormProvider, useForm } from "react-hook-form";
 import {
   registerSchema,
-  type RegisterFormType,
+  type RegisterFormTypeInput,
+  type RegisterFormTypeOutput,
 } from "../core/schemas/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export type RegisterFormProps = {
-  onSubmit: (data: RegisterFormType) => void;
+  onSubmit: (data: RegisterFormTypeOutput) => void;
 };
 
 export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
-  const form = useForm<RegisterFormType>({
+  const form = useForm<RegisterFormTypeInput>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(registerSchema as any),
     defaultValues: {

@@ -163,5 +163,106 @@ describe("Register form", () => {
     },
   );
 
-  it("should not submit if user does not accept terms", async () => {});
+  it("should not submit if user does not accept terms", async () => {
+    const { onSubmit, submitForm, toggleTerms, getAlertTerms, fillFields } =
+      setupRegisterFormTest();
+
+    await fillFields({ terms: false });
+    await submitForm();
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(getAlertTerms()).toBeInTheDocument();
+
+    await toggleTerms();
+    await submitForm();
+
+    expect(onSubmit).toHaveBeenCalled();
+    expect(getAlertTerms()).not.toBeInTheDocument();
+  });
+
+  it("should not render error messages when all fields were corrected", async () => {
+    const {
+      getAlertName,
+      getAlertEmail,
+      getAlertPassword,
+      getAlertConfirmPassword,
+      getAlertTerms,
+      fillFields,
+      onSubmit,
+      submitForm,
+    } = setupRegisterFormTest();
+
+    await submitForm();
+    expect(getAlertName()).toBeInTheDocument();
+    expect(getAlertEmail()).toBeInTheDocument();
+    expect(getAlertPassword()).toBeInTheDocument();
+    expect(getAlertTerms()).toBeInTheDocument();
+
+    await fillFields({ confirmPassword: "12345678" });
+    await submitForm();
+
+    expect(getAlertConfirmPassword()).toBeInTheDocument();
+    expect(getAlertName()).not.toBeInTheDocument();
+    expect(getAlertEmail()).not.toBeInTheDocument();
+    expect(getAlertPassword()).not.toBeInTheDocument();
+    expect(getAlertTerms()).not.toBeInTheDocument();
+
+    await fillFields();
+    await submitForm();
+
+    expect(getAlertConfirmPassword()).not.toBeInTheDocument();
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it("should rerender name error message when value is invalid after corrected", async () => {
+    const { getAlertName, fillFields, onSubmit, submitForm } =
+      setupRegisterFormTest();
+
+    expect(getAlertName()).not.toBeInTheDocument();
+
+    await submitForm();
+    expect(getAlertName()).toBeInTheDocument();
+
+    await fillFields();
+    expect(getAlertName()).not.toBeInTheDocument();
+
+    await fillFields({ name: "Fe" });
+    expect(getAlertName()).toBeInTheDocument();
+
+    await fillFields();
+    await submitForm();
+    expect(getAlertName()).not.toBeInTheDocument();
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it("should render password error when this field has changed after be valid", async () => {
+    const {
+      getAlertPassword,
+      getAlertConfirmPassword,
+      fillFields,
+      onSubmit,
+      submitForm,
+    } = setupRegisterFormTest();
+
+    await fillFields();
+    await submitForm();
+
+    expect(getAlertPassword()).not.toBeInTheDocument();
+    expect(onSubmit).toHaveBeenCalledOnce();
+
+    await fillFields({ password: "123" });
+    await submitForm();
+
+    expect(getAlertPassword()).toBeInTheDocument();
+    expect(getAlertConfirmPassword()).toBeInTheDocument();
+    expect(onSubmit).toHaveBeenCalled();
+  });
+
+  it("should not execute callback when user just fill the fields", async () => {
+    const { onSubmit, fillFields } = setupRegisterFormTest();
+
+    await fillFields();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
 });
