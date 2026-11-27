@@ -59,20 +59,19 @@ export function setupRegisterFormTest(options: SetupOptions = {}) {
 
     if (values.name !== undefined) {
       await user.clear(nameInput);
-      if (values.name) await user.type(nameInput, values.name);
+      await user.type(nameInput, values.name);
     }
     if (values.email !== undefined) {
       await user.clear(emailInput);
-      if (values.email) await user.type(emailInput, values.email);
+      await user.type(emailInput, values.email);
     }
     if (values.password !== undefined) {
       await user.clear(passwordInput);
-      if (values.password) await user.type(passwordInput, values.password);
+      await user.type(passwordInput, values.password);
     }
     if (values.confirmPassword !== undefined) {
       await user.clear(confirmPasswordInput);
-      if (values.confirmPassword)
-        await user.type(confirmPasswordInput, values.confirmPassword);
+      await user.type(confirmPasswordInput, values.confirmPassword);
     }
     if (termsCheckbox.checked !== values.terms) {
       await toggleTerms();
@@ -85,6 +84,11 @@ export function setupRegisterFormTest(options: SetupOptions = {}) {
 
   async function submitForm() {
     await user.click(submitButton);
+  }
+
+  async function submitWithEnter(el: HTMLElement) {
+    await user.click(el);
+    await user.keyboard("{Enter}");
   }
 
   return {
@@ -107,5 +111,6 @@ export function setupRegisterFormTest(options: SetupOptions = {}) {
     submitForm,
     toggleTerms,
     onSubmit,
+    submitWithEnter,
   };
 }

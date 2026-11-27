@@ -25,6 +25,10 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
   const errors = form.getErrors();
 
+  const handleSubmit = (data: RegisterFormTypeOutput) => {
+    onSubmit(data);
+  };
+
   return (
     <article>
       <div>
@@ -36,7 +40,7 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
         <form
           aria-label="Registro de usuario"
           noValidate
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit)}
         >
           <div>
             <label htmlFor="name">Nombre</label>

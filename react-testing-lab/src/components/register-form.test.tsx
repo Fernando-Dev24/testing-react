@@ -265,4 +265,64 @@ describe("Register form", () => {
     await fillFields();
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it("should submit form and its values correctly", async () => {
+    const {
+      onSubmit,
+      submitForm,
+      fillFields,
+      nameInput,
+      emailInput,
+      passwordInput,
+      confirmPasswordInput,
+      termsCheckbox,
+    } = setupRegisterFormTest();
+
+    await fillFields({
+      name: "  Fer   ",
+      email: "   refer1114@gmail.com   ",
+    });
+    await submitForm();
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit).toHaveBeenCalledWith({
+      name: "Fer",
+      email: "refer1114@gmail.com",
+      password: "refer2408",
+      terms: true,
+    });
+    expect(onSubmit).not.toHaveBeenCalledWith(
+      expect.objectContaining({ confirmPassword: "refer2408" }),
+    );
+
+    expect(nameInput).toHaveValue("  Fer   ");
+    expect(emailInput).toHaveValue("refer1114@gmail.com");
+    expect(passwordInput).toHaveValue("refer2408");
+    expect(confirmPasswordInput).toHaveValue("refer2408");
+    expect(termsCheckbox).toBeChecked();
+  });
+
+  it("should use toBeInvalid and toHaveAccessibleDescription matchers", async () => {
+    const { submitForm, onSubmit, fillFields, nameInput } =
+      setupRegisterFormTest();
+
+    await fillFields({ name: "Fe" });
+    await submitForm();
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(nameInput).toBeInvalid();
+    expect(nameInput).toHaveAccessibleDescription(
+      "El nombre debe tener al menos 3 caracteres",
+    );
+  });
+
+  it("should submit form with Enter keyboard event", async () => {
+    const { submitWithEnter, nameInput, fillFields, onSubmit } =
+      setupRegisterFormTest();
+
+    await fillFields();
+    await submitWithEnter(nameInput);
+
+    expect(onSubmit).toHaveBeenCalled();
+  });
 });
